@@ -15,6 +15,7 @@ class SignUpPage extends HookWidget {
     final passwordController = useTextEditingController();
     final confirmPasswordController = useTextEditingController();
     var isloading = useState(false);
+    var isGoogleLoading = useState(false);
 
     final formkey = useMemoized(() => GlobalKey<FormState>());
 
@@ -29,13 +30,11 @@ class SignUpPage extends HookWidget {
                 email: emailController.text, password: passwordController.text);
 
             if (context.mounted) {
-              // Check if context is still valid
               context.goNamed("signin");
             }
           }
         }
       } catch (e) {
-        // Handle any Firebase authentication errors
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(e.toString())),
@@ -47,7 +46,12 @@ class SignUpPage extends HookWidget {
     }
 
     Future<void> handleGoogleSignIn() async {
-      await GoogleAuthServices.signInWithGoogle(context);
+      try {
+        isGoogleLoading.value = true;
+        await GoogleAuthServices.signInWithGoogle(context);
+      } finally {
+        isGoogleLoading.value = false;
+      }
     }
 
     return Scaffold(
@@ -126,14 +130,27 @@ class SignUpPage extends HookWidget {
                   width: double.infinity,
                   height: 48,
                   child: OutlinedButton.icon(
-                    onPressed: handleGoogleSignIn,
-                    icon: Image.asset(
-                      'assets/images/google-logo.png',
-                      height: 20,
-                    ),
-                    label: const Text(
-                      "Continue with Google",
-                      style: TextStyle(color: Colors.black),
+                    onPressed:
+                        isGoogleLoading.value ? null : handleGoogleSignIn,
+                    icon: isGoogleLoading.value
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.black),
+                            ),
+                          )
+                        : Image.asset(
+                            'assets/images/google-logo.png',
+                            height: 20,
+                          ),
+                    label: Text(
+                      isGoogleLoading.value
+                          ? "Please wait..."
+                          : "Continue with Google",
+                      style: const TextStyle(color: Colors.black),
                     ),
                     style: OutlinedButton.styleFrom(
                       shape: RoundedRectangleBorder(
