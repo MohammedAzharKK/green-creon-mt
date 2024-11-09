@@ -14,6 +14,8 @@ class RegisterController {
     return null;
   }
 
+  ///checking the password strngth
+  ///[value]=entered password
   static String? validatePassword(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Please enter the password';
@@ -26,6 +28,7 @@ class RegisterController {
     return null;
   }
 
+  ///checking both the passwords are matching
   static String? validateConfirmPassword(
       String? password, String? confirmPassword) {
     if (confirmPassword == null || confirmPassword.trim().isEmpty) {
@@ -37,7 +40,4 @@ class RegisterController {
     }
     return null;
   }
-
-//register page on tap
-  static void registerPageOnTap() {}
 }

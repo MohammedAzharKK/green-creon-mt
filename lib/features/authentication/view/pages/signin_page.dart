@@ -12,10 +12,15 @@ class SignInPage extends HookWidget {
   Widget build(BuildContext context) {
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
+
+    //to show circleprogress indicator
     var isloading = useState(false);
+
+    //to use regex
     final formkey = useMemoized(() => GlobalKey<FormState>());
 
-    Future<void> signin() async {
+//to execute when pressing signin button
+    Future<void> signinOnTap() async {
       try {
         isloading.value = true;
 
@@ -67,12 +72,16 @@ class SignInPage extends HookWidget {
                   ),
                 ),
                 const SizedBox(height: 40),
+
+                //email textfeild
                 TextFieldWidget(
                   controller: emailController,
                   fieldname: "Email",
                   validator: RegisterController.validateEmail,
                 ),
                 const SizedBox(height: 20),
+
+//password text feild
                 TextFieldWidget(
                   controller: passwordController,
                   fieldname: "Password",
@@ -84,7 +93,7 @@ class SignInPage extends HookWidget {
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: signin,
+                    onPressed: signinOnTap,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
@@ -104,6 +113,8 @@ class SignInPage extends HookWidget {
                   ),
                 ),
                 const Spacer(),
+
+                //to go back to signup page
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

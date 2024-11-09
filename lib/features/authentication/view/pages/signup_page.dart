@@ -14,21 +14,29 @@ class SignUpPage extends HookWidget {
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
     final confirmPasswordController = useTextEditingController();
+
+    //to show circle progress indicator when clicking signup button
     var isloading = useState(false);
+
+    //to show loading in signin with google
     var isGoogleLoading = useState(false);
 
     final formkey = useMemoized(() => GlobalKey<FormState>());
 
-    Future<void> signUp() async {
+//to execute on signup ontap
+    Future<void> signUpOnTap() async {
       try {
         isloading.value = true;
 
+//to check regex and ensure no error
         if (formkey.currentState!.validate()) {
+          //creating user using firebase
           if (emailController.text.isNotEmpty &&
               passwordController.text.isNotEmpty) {
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
                 email: emailController.text, password: passwordController.text);
 
+//to check the widget is in the widget tree
             if (context.mounted) {
               context.goNamed("signin");
             }
@@ -36,6 +44,7 @@ class SignUpPage extends HookWidget {
         }
       } catch (e) {
         if (context.mounted) {
+          //show error msg as a snack bar
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(e.toString())),
           );
@@ -45,7 +54,8 @@ class SignUpPage extends HookWidget {
       }
     }
 
-    Future<void> handleGoogleSignIn() async {
+//to execute on signin with google
+    Future<void> googleSignInOnTap() async {
       try {
         isGoogleLoading.value = true;
         await GoogleAuthServices.signInWithGoogle(context);
@@ -80,12 +90,16 @@ class SignUpPage extends HookWidget {
                   ),
                 ),
                 const SizedBox(height: 40),
+
+                //email text feild
                 TextFieldWidget(
                   controller: emailController,
                   fieldname: "Email",
                   validator: RegisterController.validateEmail,
                 ),
                 const SizedBox(height: 20),
+
+                //password text feild
                 TextFieldWidget(
                   controller: passwordController,
                   fieldname: "Password",
@@ -93,6 +107,8 @@ class SignUpPage extends HookWidget {
                   isPassword: true,
                 ),
                 const SizedBox(height: 20),
+
+                //confirm password
                 TextFieldWidget(
                   controller: confirmPasswordController,
                   fieldname: "Confirm Password",
@@ -106,7 +122,7 @@ class SignUpPage extends HookWidget {
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: signUp,
+                    onPressed: signUpOnTap,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
@@ -126,12 +142,13 @@ class SignUpPage extends HookWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                //google signin button
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: OutlinedButton.icon(
-                    onPressed:
-                        isGoogleLoading.value ? null : handleGoogleSignIn,
+                    onPressed: isGoogleLoading.value ? null : googleSignInOnTap,
                     icon: isGoogleLoading.value
                         ? const SizedBox(
                             height: 20,
