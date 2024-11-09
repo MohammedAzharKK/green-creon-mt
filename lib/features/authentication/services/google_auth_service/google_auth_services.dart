@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,15 +12,15 @@ class GoogleAuthServices {
     try {
       await signOut(); // Sign out from any existing session
 
-      // Trigger the authentication flow
+      // Trigger the authentication
       final GoogleSignInAccount? userDetails = await _googleSignIn.signIn();
 
       if (userDetails == null) {
-        // User canceled the sign-in flow
+        // User canceled the sign-in
         return;
       }
 
-      // Obtain auth details from request
+      // get auth details from request
       final GoogleSignInAuthentication googleAuth =
           await userDetails.authentication;
 
@@ -37,7 +39,7 @@ class GoogleAuthServices {
       }
     } catch (e) {
       if (context.mounted) {
-        // Show error message
+        // Show error msg in snack bar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Sign in failed: ${e.toString()}')),
         );
@@ -45,6 +47,7 @@ class GoogleAuthServices {
     }
   }
 
+//signout
   static Future<void> signOut() async {
     try {
       if (await _googleSignIn.isSignedIn()) {
@@ -52,7 +55,7 @@ class GoogleAuthServices {
         await FirebaseAuth.instance.signOut();
       }
     } catch (e) {
-      debugPrint('Sign out failed: $e');
+      log('Sign out failed: $e');
     }
   }
 }

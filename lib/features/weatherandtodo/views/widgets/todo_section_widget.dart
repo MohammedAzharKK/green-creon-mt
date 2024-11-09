@@ -9,13 +9,20 @@ class TodoSectionWidget extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final todoController = useTextEditingController();
+
+    //to store todos in a list
     final todos = useState<List<TodoModel>>([]);
+
     final editingIndex = useState<int?>(-1);
+
+    //object for get storage to save in device memmory
     final storage = GetStorage();
 
     useEffect(() {
+      //to get todos from device after opening the app
       final storedTodos = storage.read<List>('todos');
       if (storedTodos != null) {
+        //converting json to dart object
         todos.value = storedTodos
             .map((todo) => TodoModel.fromJson(Map<String, dynamic>.from(todo)))
             .toList();
@@ -24,25 +31,38 @@ class TodoSectionWidget extends HookWidget {
     }, []);
 
     void saveTodos(List<TodoModel> todoList) {
+      // converting todo list from dart object to json
       storage.write('todos', todoList.map((todo) => todo.toJson()).toList());
     }
 
     void addTodo() {
-      if (todoController.text.isEmpty) return;
+      // to check weather there is text to save in todo
+      if (todoController.text.isEmpty && todoController.text.trim().isEmpty)
+        return;
 
+      // Check if the text is not empty and not only whitespace
       if (editingIndex.value != -1) {
         final newTodos = List<TodoModel>.from(todos.value);
-        newTodos[editingIndex.value!] = TodoModel(text: todoController.text);
+        newTodos[editingIndex.value!] =
+            TodoModel(text: todoController.text.trim());
         todos.value = newTodos;
         editingIndex.value = -1;
       } else {
-        todos.value = [...todos.value, TodoModel(text: todoController.text)];
+        //adding the todo to the todo list
+        if (todoController.text.trim().isNotEmpty) {
+          todos.value = [
+            ...todos.value,
+            TodoModel(text: todoController.text.trim())
+          ];
+        }
       }
 
       saveTodos(todos.value);
       todoController.clear();
     }
 
+    /// removing from the list and from the device
+    /// [index]=is the selected index passing from the homepage
     void removeTodo(int index) {
       final newTodos = List<TodoModel>.from(todos.value);
       newTodos.removeAt(index);
@@ -56,12 +76,20 @@ class TodoSectionWidget extends HookWidget {
     }
 
     void toggleTodo(int index) {
+      // Create a copy of the existing todos list to avoid changing the original list
       final newTodos = List<TodoModel>.from(todos.value);
+
+      // Update the isCompleted status of the todo at the specified index
       newTodos[index] = TodoModel(
-        text: newTodos[index].text,
-        isCompleted: !newTodos[index].isCompleted,
+        text: newTodos[index].text, // Keep the current text
+        isCompleted:
+            !newTodos[index].isCompleted, // Toggle the isCompleted status
       );
+
+      // Update the todos list with the new list
       todos.value = newTodos;
+
+      // Save the updated todos list to storage
       saveTodos(todos.value);
     }
 
@@ -124,7 +152,8 @@ class TodoSectionWidget extends HookWidget {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: todos.value.length,
+            itemCount: todos.value
+                .length, //length of the todos defined by checking the length of todo list
             itemBuilder: (context, index) {
               final todo = todos.value[index];
               return Card(

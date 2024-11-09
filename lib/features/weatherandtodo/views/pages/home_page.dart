@@ -28,7 +28,9 @@ class HomePage extends HookWidget {
 
         log('Weather Data Received: $weatherData');
 
+//to assign the temp fetched by api
         temperature.value = weatherData['main']['temp'].toStringAsFixed(1);
+
         cityName.value = weatherData['name'];
         searchController.clear();
       } catch (e) {
