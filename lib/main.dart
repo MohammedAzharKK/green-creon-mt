@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_signin/core/routes/routes.dart';
 import 'package:flutter_signin/features/authentication/view/pages/signup_page.dart';
-import 'package:flutter_signin/features/weather/views/pages/homescreen.dart';
+import 'package:flutter_signin/features/weatherandtodo/views/pages/home_page.dart';
 import 'package:flutter_signin/firebase_options.dart';
+import 'package:get_storage/get_storage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await GetStorage.init();
 
   runApp(const App());
 }
@@ -25,7 +27,7 @@ class App extends HookWidget {
       FirebaseAuth.instance.authStateChanges().listen((user) {
         if (user != null) {
           navigatorKey.currentState!.pushReplacement(
-              MaterialPageRoute(builder: (context) => const Homescreen()));
+              MaterialPageRoute(builder: (context) => const HomePage()));
         } else {
           navigatorKey.currentState!.pushReplacement(
               MaterialPageRoute(builder: (context) => const SignUpPage()));

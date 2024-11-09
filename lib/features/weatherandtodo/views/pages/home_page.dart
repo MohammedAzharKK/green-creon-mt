@@ -1,33 +1,22 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_signin/features/weather/services/weather_service.dart';
+import 'package:flutter_signin/features/weatherandtodo/services/weather_service.dart';
+import 'package:flutter_signin/features/weatherandtodo/views/widgets/todo_section_widget.dart';
 import 'package:go_router/go_router.dart';
 
-class Homescreen extends HookWidget {
-  const Homescreen({super.key});
+class HomePage extends HookWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final searchController = useTextEditingController();
-    final todoController = useTextEditingController();
-    final todos = useState<List<String>>([]);
-    final temperature = useState<String>('');
-    final cityName = useState<String>('');
+
     final isLoading = useState(false);
-
-    void addTodo() {
-      if (todoController.text.isNotEmpty) {
-        todos.value = [...todos.value, todoController.text];
-        todoController.clear();
-      }
-    }
-
-    void removeTodo(int index) {
-      final newTodos = List<String>.from(todos.value);
-      newTodos.removeAt(index);
-      todos.value = newTodos;
-    }
+    final temperature = useState('');
+    final cityName = useState('');
 
     Future<void> searchWeather() async {
       if (searchController.text.isEmpty) return;
@@ -37,19 +26,19 @@ class Homescreen extends HookWidget {
         final weatherData =
             await WeatherService.getWeather(searchController.text);
 
-        print('Temperature: ${weatherData['main']['temp']}');
-        print('City: ${weatherData['name']}');
+        log('Weather Data Received: $weatherData');
 
         temperature.value = weatherData['main']['temp'].toStringAsFixed(1);
         cityName.value = weatherData['name'];
         searchController.clear();
       } catch (e) {
-        print('Error in searchWeather: $e');
+        log('Error in searchWeather: $e');
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(e.toString()),
               backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
             ),
           );
         }
@@ -89,7 +78,7 @@ class Homescreen extends HookWidget {
               ),
               const SizedBox(height: 24),
 
-              // Weather Search Section
+              /// Weather Search Section
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -208,78 +197,8 @@ class Homescreen extends HookWidget {
               const SizedBox(height: 24),
 
               // Todo Section
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Todo List",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: todoController,
-                            decoration: InputDecoration(
-                              hintText: "Add a new todo",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        ElevatedButton(
-                          onPressed: addTodo,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 16,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text(
-                            "Add",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: todos.value.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          child: ListTile(
-                            title: Text(todos.value[index]),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () => removeTodo(index),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+
+              const TodoSectionWidget(),
               const SizedBox(height: 24),
 
               // Logout Button

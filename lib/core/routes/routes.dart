@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_signin/features/authentication/view/pages/signin_page.dart';
 import 'package:flutter_signin/features/authentication/view/pages/signup_page.dart';
-import 'package:flutter_signin/features/weather/views/pages/homescreen.dart';
+import 'package:flutter_signin/features/weatherandtodo/views/pages/home_page.dart';
 import 'package:go_router/go_router.dart';
 
 final GoRouter router = GoRouter(
@@ -46,7 +46,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: "/home",
       name: "HomePage",
-      builder: (context, state) => const Homescreen(),
+      builder: (context, state) => const HomePage(),
     ),
   ],
   errorBuilder: (context, state) => const SignUpPage(),
